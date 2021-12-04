@@ -1,19 +1,19 @@
 package repository;
 
-import model.Student;
+import model.Teacher;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-
-public class StudentJDBCRepository implements ICrudRepository<Student> {
-
+public class TeacherJDBCRepository implements ICrudRepository<Teacher> {
     private String DB_URL;
     private String USER;
     private String PASS;
+
 
     public void openConnection() throws IOException {
         FileInputStream fis = new FileInputStream("D:\\Downloads\\LECTII UBB\\An_2 Semestrul_1\\Metode Avansate de Programare\\Laborator\\Hausaufgabe_5\\src\\main\\resources\\config.properties");
@@ -26,17 +26,17 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
 
 
     @Override
-    public Student findOne(Student obj) throws IOException {
+    public Teacher findOne(Teacher obj) throws IOException {
 
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); Statement statement = connection.createStatement()) {
-            String QUERY = "SELECT studentId, firstName, lastName, totalCredits FROM student";
+            String QUERY = "SELECT teacherId, firstName, lastName FROM teacher";
             ResultSet resultSet = statement.executeQuery(QUERY);
 
             while (resultSet.next()) {
-                if (obj.getStudentId() == resultSet.getInt("studentId")) {
-                    return new Student(resultSet.getString("firstName"), resultSet.getString("lastName"),
-                            resultSet.getInt("studentId"), resultSet.getInt("totalCredits"));
+                if (obj.getTeacherId() == resultSet.getInt("teacherId")) {
+                    return new Teacher(resultSet.getString("firstName"), resultSet.getString("lastName"),
+                            resultSet.getInt("teacherId"));
                 }
             }
         } catch (SQLException e) {
@@ -46,36 +46,35 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
     }
 
     @Override
-    public Iterable<Student> findAll() throws IOException {
+    public Iterable<Teacher> findAll() throws IOException {
 
         openConnection();
-        ArrayList<Student> studentList = new ArrayList<>();
+        List<Teacher> teacherList = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); Statement statement = connection.createStatement()) {
-            String QUERY = "SELECT studentId, firstName, lastName, totalCredits FROM student";
+            String QUERY = "SELECT teacherId, firstName, lastName FROM teacher";
             ResultSet resultSet = statement.executeQuery(QUERY);
 
             while (resultSet.next()) {
-                Student student = new Student(resultSet.getString("firstName"), resultSet.getString("lastName"),
-                        resultSet.getInt("studentId"), resultSet.getInt("totalCredits"));
-                studentList.add(student);
+                Teacher teacher = new Teacher(resultSet.getString("firstName"), resultSet.getString("lastName"),
+                        resultSet.getInt("teacherId"));
+                teacherList.add(teacher);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return studentList;
+        return teacherList;
     }
 
     @Override
-    public Student save(Student obj) throws IOException {
+    public Teacher save(Teacher obj) throws IOException {
 
         openConnection();
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO student VALUES (?,?,?,?)")) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO teacher VALUES (?,?,?)")) {
             if (findOne(obj) == null) {
-                preparedStatement.setInt(1, obj.getStudentId());
+                preparedStatement.setInt(1, obj.getTeacherId());
                 preparedStatement.setString(2, obj.getFirstName());
                 preparedStatement.setString(3, obj.getLastName());
-                preparedStatement.setInt(4, obj.getTotalCredits());
                 preparedStatement.executeUpdate();
                 return null;
             }
@@ -86,15 +85,14 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
     }
 
     @Override
-    public Student update(Student obj) throws IOException {
+    public Teacher update(Teacher obj) throws IOException {
 
         openConnection();
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE student SET firstName = ?, lastName = ?, totalCredits = ? WHERE studentId = ?")) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE teacher SET firstName = ?, lastName = ? WHERE teacherId = ?")) {
             if (findOne(obj) != null) {
                 preparedStatement.setString(1, obj.getFirstName());
                 preparedStatement.setString(2, obj.getLastName());
-                preparedStatement.setInt(3, obj.getTotalCredits());
-                preparedStatement.setInt(4, obj.getStudentId());
+                preparedStatement.setInt(3, obj.getTeacherId());
                 preparedStatement.executeUpdate();
                 return null;
             }
@@ -105,12 +103,12 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
     }
 
     @Override
-    public Student delete(Student obj) throws IOException {
+    public Teacher delete(Teacher obj) throws IOException {
 
         openConnection();
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM student WHERE studentId = ?")) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM teacher WHERE teacherId = ?")) {
             if (findOne(obj) != null) {
-                preparedStatement.setInt(1, obj.getStudentId());
+                preparedStatement.setInt(1, obj.getTeacherId());
                 preparedStatement.executeUpdate();
                 return obj;
             }

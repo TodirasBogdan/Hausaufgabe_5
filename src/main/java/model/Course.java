@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,4 +83,5 @@ public class Course {
     public int hashCode() {
         return Objects.hash(getCourseId(), getName(), getTeacherId(), getCredits(), getMaxEnrollment());
     }
+
 }
