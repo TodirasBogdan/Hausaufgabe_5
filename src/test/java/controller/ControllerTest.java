@@ -11,7 +11,8 @@ import repository.TeacherJDBCRepository;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ControllerTest {
 
@@ -19,12 +20,12 @@ class ControllerTest {
     StudentJDBCRepository studentJDBCRepository = new StudentJDBCRepository();
     TeacherJDBCRepository teacherJDBCRepository = new TeacherJDBCRepository();
     EnrolledJDBCRepository enrolledJDBCRepository = new EnrolledJDBCRepository();
-    Controller controller = new Controller(courseJDBCRepository,studentJDBCRepository,teacherJDBCRepository,enrolledJDBCRepository);
+    Controller controller = new Controller(courseJDBCRepository, studentJDBCRepository, teacherJDBCRepository, enrolledJDBCRepository);
 
-    Course course = new Course(100,"Algebra",10,5,70);
-    Student student1 = new Student("Viorel","Curecheriu",1,30);
-    Student student2 = new Student("Dorel","Lob",2,20);
-    Student student3 = new Student("Victor","Grigore",3,25);
+    Course course = new Course(100, "Algebra", 10, 5, 70);
+    Student student1 = new Student("Viorel", "Curecheriu", 1, 30);
+    Student student2 = new Student("Dorel", "Lob", 2, 20);
+    Student student3 = new Student("Victor", "Grigore", 3, 25);
 
     @BeforeEach
     void setUp() throws IOException {
@@ -32,50 +33,61 @@ class ControllerTest {
         studentJDBCRepository.save(student2);
         studentJDBCRepository.delete(student3);
         courseJDBCRepository.save(course);
-        enrolledJDBCRepository.delete(student1.getStudentId(),course.getCourseId());
-    }
-
-    @Test
-    void testFindAllStudents() throws IOException {
-        assertEquals(controller.findAllStudents().size(),2);
+        enrolledJDBCRepository.delete(student1.getStudentId(), course.getCourseId());
     }
 
     @Test
     void testAddStudent() throws IOException {
-        assertEquals(controller.findAllStudents().size(),2);
-        controller.addStudent("Victor","Grigore",3,25);
-        assertEquals(controller.findAllStudents().size(),3);
+        assertEquals(controller.findAllStudents().size(), 2);
+        controller.addStudent("Victor", "Grigore", 3, 25);
+        assertEquals(controller.findAllStudents().size(), 3);
+    }
+
+    @Test
+    void testFindAllStudents() throws IOException {
+        assertEquals(controller.findAllStudents().size(), 2);
+    }
+
+    @Test
+    void testUpdateStudent() throws IOException {
+        assertEquals(controller.findAllStudents().size(), 2);
+        controller.addStudent("Victor", "Grigore", 3, 25);
+        assertEquals(controller.findAllStudents().size(), 3);
+        controller.updateStudent("Victor", "Grigore", 3, 5555);
+        assertEquals(controller.findAllStudents().size(), 3);
+        assertEquals(controller.findAllStudents().get(2).getStudentId(), 3);
+        assertEquals(controller.findAllStudents().get(2).getTotalCredits(), 5555);
     }
 
     @Test
     void testDeleteStudent() throws IOException {
-        assertEquals(controller.findAllStudents().size(),2);
-        controller.addStudent("Victor","Grigore",3,25);
-        assertEquals(controller.findAllStudents().size(),3);
+        assertEquals(controller.findAllStudents().size(), 2);
+        controller.addStudent("Victor", "Grigore", 3, 25);
+        assertEquals(controller.findAllStudents().size(), 3);
         controller.deleteStudent(student3);
-        assertEquals(controller.findAllStudents().size(),2);
+        assertEquals(controller.findAllStudents().size(), 2);
     }
 
     @Test
     void testSortStudentsByCredits() throws IOException {
-        assertEquals(controller.findAllStudents().size(),2);
-        assertEquals(controller.sortStudentsByCredits().get(0),student2);
-        assertEquals(controller.sortStudentsByCredits().get(1),student1);
-        assertEquals(controller.findAllStudents().size(),2);
+        assertEquals(controller.findAllStudents().size(), 2);
+        assertEquals(controller.sortStudentsByCredits().get(0), student2);
+        assertEquals(controller.sortStudentsByCredits().get(1), student1);
+        assertEquals(controller.findAllStudents().size(), 2);
     }
 
     @Test
     void testFilterStudentsByCredits() throws IOException {
-        assertEquals(controller.findAllStudents().size(),2);
-        assertEquals(controller.filterStudentsByCredits().size(),1);
-        assertEquals(controller.filterStudentsByCredits().get(0),student2);
-        assertEquals(controller.findAllStudents().size(),2);
+        assertEquals(controller.findAllStudents().size(), 2);
+        assertEquals(controller.filterStudentsByCredits().size(), 1);
+        assertEquals(controller.filterStudentsByCredits().get(0), student2);
+        assertEquals(controller.findAllStudents().size(), 2);
     }
 
     @Test
     void testRegister() throws IOException {
-        assertEquals(controller.findAllCourses().size(),1);
-        assertEquals(controller.findAllStudents().size(),2);
+        assertEquals(controller.findAllCourses().size(), 1);
+        assertEquals(controller.findAllStudents().size(), 2);
         assertTrue(controller.register(student1, course));
     }
 }

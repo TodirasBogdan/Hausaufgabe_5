@@ -2,7 +2,7 @@ package model;
 
 import java.util.Objects;
 
-public class Teacher extends Person{
+public class Teacher extends Person {
 
     private int teacherId;
 

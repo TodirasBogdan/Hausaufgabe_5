@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 public class Course {
@@ -74,8 +72,7 @@ public class Course {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Course)) return false;
-        Course course = (Course) o;
+        if (!(o instanceof Course course)) return false;
         return getCourseId() == course.getCourseId() && getCredits() == course.getCredits() && getMaxEnrollment() == course.getMaxEnrollment() && Objects.equals(getName(), course.getName()) && Objects.equals(getTeacherId(), course.getTeacherId());
     }
 

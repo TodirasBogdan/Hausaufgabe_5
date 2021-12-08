@@ -1,9 +1,8 @@
 package model;
 
-import java.util.Comparator;
 import java.util.Objects;
 
-public class Student extends Person{
+public class Student extends Person {
 
     private int studentId;
     private int totalCredits;
@@ -53,10 +52,4 @@ public class Student extends Person{
         return Objects.hash(super.hashCode(), getStudentId(), getTotalCredits());
     }
 
-    public static class NameSorter implements Comparator<Student> {
-        @Override
-        public int compare(Student s1, Student s2){
-            return s1.getLastName().compareToIgnoreCase(s2.getLastName());
-        }
-    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class CourseJDBCRepository implements ICrudRepository<Course> {
-    
+
     private String DB_URL;
     private String USER;
     private String PASS;
@@ -25,6 +25,10 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
         PASS = prop.getProperty("PASS");
     }
 
+    public void closeConnection(Connection connection) throws SQLException {
+        connection.close();
+    }
+
 
     @Override
     public Course findOne(Course obj) throws IOException {
@@ -36,9 +40,12 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
 
             while (resultSet.next()) {
                 if (obj.getCourseId() == resultSet.getInt("courseId")) {
-                    return new Course(resultSet.getInt("courseId"), resultSet.getString("name"), resultSet.getInt("teacherId"), resultSet.getInt("credits"), resultSet.getInt("maxEnrollment"));
+                    closeConnection(connection);
+                    return obj;
                 }
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -59,6 +66,8 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
                 Course course = new Course(resultSet.getInt("courseId"), resultSet.getString("name"), resultSet.getInt("teacherId"), resultSet.getInt("credits"), resultSet.getInt("maxEnrollment"));
                 courseList.add(course);
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -66,7 +75,7 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
     }
 
     @Override
-    public Course save(Course obj) throws IOException {
+    public void save(Course obj) throws IOException {
 
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO course VALUES (?,?,?,?,?)")) {
@@ -77,16 +86,16 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
                 preparedStatement.setInt(4, obj.getCredits());
                 preparedStatement.setInt(5, obj.getMaxEnrollment());
                 preparedStatement.executeUpdate();
-                return null;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-        return obj;
     }
 
     @Override
-    public Course update(Course obj) throws IOException {
+    public void update(Course obj) throws IOException {
 
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE course SET name = ?, teacherId = ?, credits = ?, maxEnrollment = ? WHERE courseId = ?")) {
@@ -97,12 +106,12 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
                 preparedStatement.setInt(4, obj.getMaxEnrollment());
                 preparedStatement.setInt(5, obj.getCourseId());
                 preparedStatement.executeUpdate();
-                return null;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-        return obj;
     }
 
     @Override
@@ -113,8 +122,11 @@ public class CourseJDBCRepository implements ICrudRepository<Course> {
             if (findOne(obj) != null) {
                 preparedStatement.setInt(1, obj.getCourseId());
                 preparedStatement.executeUpdate();
+                closeConnection(connection);
                 return obj;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }

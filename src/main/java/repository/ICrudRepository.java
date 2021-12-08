@@ -13,9 +13,9 @@ public interface ICrudRepository<T> {
 
     Iterable<T> findAll() throws IOException;
 
-    T save(T obj) throws IOException;
+    void save(T obj) throws IOException;
 
-    T update(T obj) throws IOException;
+    void update(T obj) throws IOException;
 
     T delete(T obj) throws IOException;
 }

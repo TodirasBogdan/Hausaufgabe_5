@@ -21,6 +21,10 @@ public class EnrolledJDBCRepository {
         PASS = prop.getProperty("PASS");
     }
 
+    public void closeConnection(Connection connection) throws SQLException {
+        connection.close();
+    }
+
     public ArrayList<Integer> findCoursesByStudentId(int studentId) throws IOException {
         openConnection();
         ArrayList<Integer> coursesIds = new ArrayList<>();
@@ -33,6 +37,8 @@ public class EnrolledJDBCRepository {
                     coursesIds.add(resultSet.getInt("courseId"));
                 }
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -51,60 +57,58 @@ public class EnrolledJDBCRepository {
                     studentsIds.add(resultSet.getInt("studentId"));
                 }
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return studentsIds;
     }
 
-    public boolean save(int studentId, int courseId) throws IOException {
+    public void save(int studentId, int courseId) throws IOException {
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO enrolled VALUES (?,?)")) {
             preparedStatement.setInt(1, studentId);
             preparedStatement.setInt(2, courseId);
             preparedStatement.executeUpdate();
-            return true;
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean delete(int studentId, int courseId) throws IOException {
+    public void delete(int studentId, int courseId) throws IOException {
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM enrolled WHERE studentId = ? AND courseId = ?")) {
             preparedStatement.setInt(1, studentId);
             preparedStatement.setInt(2, courseId);
             preparedStatement.executeUpdate();
-            return true;
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean deleteAllStudentsFromCourse(int courseId) throws IOException {
+    public void deleteAllStudentsFromCourse(int courseId) throws IOException {
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM enrolled WHERE courseId = ?")) {
             preparedStatement.setInt(1, courseId);
             preparedStatement.executeUpdate();
-            return true;
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean deleteAllCoursesFromStudent(int studentId) throws IOException {
+    public void deleteAllCoursesFromStudent(int studentId) throws IOException {
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM enrolled WHERE studentId = ?")) {
             preparedStatement.setInt(1, studentId);
             preparedStatement.executeUpdate();
-            return true;
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
 

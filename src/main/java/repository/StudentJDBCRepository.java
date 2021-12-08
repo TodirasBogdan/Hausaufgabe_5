@@ -24,6 +24,10 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
         PASS = prop.getProperty("PASS");
     }
 
+    public void closeConnection(Connection connection) throws SQLException {
+        connection.close();
+    }
+
 
     @Override
     public Student findOne(Student obj) throws IOException {
@@ -35,10 +39,12 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
 
             while (resultSet.next()) {
                 if (obj.getStudentId() == resultSet.getInt("studentId")) {
-                    return new Student(resultSet.getString("firstName"), resultSet.getString("lastName"),
-                            resultSet.getInt("studentId"), resultSet.getInt("totalCredits"));
+                    closeConnection(connection);
+                    return obj;
                 }
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -60,6 +66,8 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
                         resultSet.getInt("studentId"), resultSet.getInt("totalCredits"));
                 studentList.add(student);
             }
+
+            closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -67,7 +75,7 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
     }
 
     @Override
-    public Student save(Student obj) throws IOException {
+    public void save(Student obj) throws IOException {
 
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO student VALUES (?,?,?,?)")) {
@@ -77,16 +85,16 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
                 preparedStatement.setString(3, obj.getLastName());
                 preparedStatement.setInt(4, obj.getTotalCredits());
                 preparedStatement.executeUpdate();
-                return null;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-        return obj;
     }
 
     @Override
-    public Student update(Student obj) throws IOException {
+    public void update(Student obj) throws IOException {
 
         openConnection();
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE student SET firstName = ?, lastName = ?, totalCredits = ? WHERE studentId = ?")) {
@@ -96,12 +104,12 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
                 preparedStatement.setInt(3, obj.getTotalCredits());
                 preparedStatement.setInt(4, obj.getStudentId());
                 preparedStatement.executeUpdate();
-                return null;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-        return obj;
     }
 
     @Override
@@ -112,8 +120,11 @@ public class StudentJDBCRepository implements ICrudRepository<Student> {
             if (findOne(obj) != null) {
                 preparedStatement.setInt(1, obj.getStudentId());
                 preparedStatement.executeUpdate();
+                closeConnection(connection);
                 return obj;
             }
+
+            closeConnection(connection);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }

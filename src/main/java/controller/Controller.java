@@ -14,98 +14,107 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public record Controller(CourseJDBCRepository crepo, StudentJDBCRepository srepo, TeacherJDBCRepository trepo, EnrolledJDBCRepository erepo) {
+public record Controller(CourseJDBCRepository courseJDBCRepository, StudentJDBCRepository studentJDBCRepository,
+                         TeacherJDBCRepository teacherJDBCRepository, EnrolledJDBCRepository enrolledJDBCRepository) {
 
-    public boolean addCourse(int courseId, String name, int teacherId, int credits, int maxEnrollment) throws IOException {
-
-        Course c = new Course(courseId, name, teacherId, credits, maxEnrollment);
-        this.crepo.save(c);
-        return true;
+    public void addCourse(int courseId, String name, int teacherId, int credits, int maxEnrollment) throws IOException {
+        Course course = new Course(courseId, name, teacherId, credits, maxEnrollment);
+        this.courseJDBCRepository.save(course);
     }
 
-    public boolean addStudent(String firstName, String lastName, int studentId, int totalCredits) throws IOException {
-        Student s = new Student(firstName, lastName, studentId, totalCredits);
-        this.srepo.save(s);
-        return true;
+    public void addStudent(String firstName, String lastName, int studentId, int totalCredits) throws IOException {
+        Student student = new Student(firstName, lastName, studentId, totalCredits);
+        this.studentJDBCRepository.save(student);
     }
 
-    public boolean addTeacher(String firstName, String lastName, int teacherId) throws IOException {
+    public void addTeacher(String firstName, String lastName, int teacherId) throws IOException {
         Teacher teacher = new Teacher(firstName, lastName, teacherId);
-        this.trepo.save(teacher);
-        return true;
+        this.teacherJDBCRepository.save(teacher);
     }
 
 
     public boolean register(Student student, Course course) throws IOException {
-        Student foundStudent = this.srepo.findOne(student);
-        Course foundCourse = this.crepo.findOne(course);
-        this.erepo.save(foundStudent.getStudentId(), foundCourse.getCourseId());
+        Student foundStudent = this.studentJDBCRepository.findOne(student);
+        Course foundCourse = this.courseJDBCRepository.findOne(course);
+        this.enrolledJDBCRepository.save(foundStudent.getStudentId(), foundCourse.getCourseId());
         return true;
     }
 
+
     public ArrayList<Course> findAllCourses() throws IOException {
-        return (ArrayList<Course>) crepo.findAll();
+        return (ArrayList<Course>) courseJDBCRepository.findAll();
     }
 
     public ArrayList<Student> findAllStudents() throws IOException {
-        return (ArrayList<Student>) srepo.findAll();
+        return (ArrayList<Student>) studentJDBCRepository.findAll();
     }
 
     public ArrayList<Teacher> findAllTeachers() throws IOException {
-        return (ArrayList<Teacher>) trepo.findAll();
+        return (ArrayList<Teacher>) teacherJDBCRepository.findAll();
     }
 
-    public boolean deleteCourse(Course course) throws IOException {
-        Course foundCourse = this.crepo.findOne(course);
-        this.erepo.deleteAllStudentsFromCourse(foundCourse.getCourseId());
-        this.crepo.delete(foundCourse);
-        return true;
+    public void updateCourse(int courseId, String name, int teacherId, int credits, int maxEnrollment) throws IOException {
+        Course course = new Course(courseId, name, teacherId, credits, maxEnrollment);
+        this.courseJDBCRepository.update(course);
     }
 
-    public boolean deleteStudent(Student student) throws IOException {
-        Student foundStudent = this.srepo.delete(student);
-        this.erepo.deleteAllCoursesFromStudent(foundStudent.getStudentId());
-        this.srepo.delete(foundStudent);
-        return true;
+    public void updateStudent(String firstName, String lastName, int studentId, int totalCredits) throws IOException {
+        Student student = new Student(firstName, lastName, studentId, totalCredits);
+        this.studentJDBCRepository.update(student);
     }
 
+    public void updateTeacher(String firstName, String lastName, int teacherId) throws IOException {
+        Teacher teacher = new Teacher(firstName, lastName, teacherId);
+        this.teacherJDBCRepository.update(teacher);
+    }
 
-    public boolean deleteTeacher(Teacher teacher) throws IOException {
-        Teacher foundTeacher = this.trepo.findOne(teacher);
-        ArrayList<Course> courses = (ArrayList<Course>) this.crepo.findAll();
+    public void deleteCourse(Course course) throws IOException {
+        Course foundCourse = this.courseJDBCRepository.findOne(course);
+        this.enrolledJDBCRepository.deleteAllStudentsFromCourse(foundCourse.getCourseId());
+        this.courseJDBCRepository.delete(foundCourse);
+    }
+
+    public void deleteStudent(Student student) throws IOException {
+        Student foundStudent = this.studentJDBCRepository.delete(student);
+        this.enrolledJDBCRepository.deleteAllCoursesFromStudent(foundStudent.getStudentId());
+        this.studentJDBCRepository.delete(foundStudent);
+    }
+
+    public void deleteTeacher(Teacher teacher) throws IOException {
+        Teacher foundTeacher = this.teacherJDBCRepository.findOne(teacher);
+        ArrayList<Course> courses = (ArrayList<Course>) this.courseJDBCRepository.findAll();
         for (Course c : courses) {
             if (c.getTeacherId() == foundTeacher.getTeacherId()) {
                 this.deleteCourse(c);
             }
         }
-        this.trepo.delete(foundTeacher);
-        return true;
+        this.teacherJDBCRepository.delete(foundTeacher);
     }
 
 
     public ArrayList<Student> sortStudentsByCredits() throws IOException {
-        ArrayList<Student> newlist = (ArrayList<Student>) srepo.findAll();
-        return (ArrayList<Student>) newlist.stream()
+        ArrayList<Student> students = (ArrayList<Student>) studentJDBCRepository.findAll();
+        return (ArrayList<Student>) students.stream()
                 .sorted(Comparator.comparingInt(Student::getTotalCredits))
                 .collect(Collectors.toList());
     }
 
     public ArrayList<Course> sortCoursesByCredits() throws IOException {
-        ArrayList<Course> newlist = (ArrayList<Course>) crepo.findAll();
-        return (ArrayList<Course>) newlist.stream()
+        ArrayList<Course> courses = (ArrayList<Course>) courseJDBCRepository.findAll();
+        return (ArrayList<Course>) courses.stream()
                 .sorted(Comparator.comparingInt(Course::getCredits))
                 .collect(Collectors.toList());
     }
 
     public ArrayList<Student> filterStudentsByCredits() throws IOException {
         Predicate<Student> byCredits = student -> student.getTotalCredits() < 25;
-        ArrayList<Student> newlist = (ArrayList<Student>) srepo.findAll();
-        return (ArrayList<Student>) newlist.stream().filter(byCredits).collect(Collectors.toList());
+        ArrayList<Student> students = (ArrayList<Student>) studentJDBCRepository.findAll();
+        return (ArrayList<Student>) students.stream().filter(byCredits).collect(Collectors.toList());
     }
 
     public ArrayList<Course> filterCoursesByCredit(int credits) throws IOException {
         Predicate<Course> byCredits = course -> course.getCredits() < credits;
-        ArrayList<Course> newlist = (ArrayList<Course>) crepo.findAll();
-        return (ArrayList<Course>) newlist.stream().filter(byCredits).collect(Collectors.toList());
+        ArrayList<Course> courses = (ArrayList<Course>) courseJDBCRepository.findAll();
+        return (ArrayList<Course>) courses.stream().filter(byCredits).collect(Collectors.toList());
     }
 }
