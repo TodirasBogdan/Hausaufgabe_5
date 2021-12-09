@@ -3,6 +3,7 @@ package controller;
 import model.Course;
 import model.Student;
 import model.Teacher;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import repository.CourseJDBCRepository;
@@ -17,19 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ControllerTest {
 
-    CourseJDBCRepository courseJDBCRepository = new CourseJDBCRepository();
-    StudentJDBCRepository studentJDBCRepository = new StudentJDBCRepository();
-    TeacherJDBCRepository teacherJDBCRepository = new TeacherJDBCRepository();
-    EnrolledJDBCRepository enrolledJDBCRepository = new EnrolledJDBCRepository();
+    static CourseJDBCRepository courseJDBCRepository = new CourseJDBCRepository();
+    static StudentJDBCRepository studentJDBCRepository = new StudentJDBCRepository();
+    static TeacherJDBCRepository teacherJDBCRepository = new TeacherJDBCRepository();
+    static EnrolledJDBCRepository enrolledJDBCRepository = new EnrolledJDBCRepository();
     Controller controller = new Controller(courseJDBCRepository, studentJDBCRepository, teacherJDBCRepository, enrolledJDBCRepository);
 
-    Course course1 = new Course(100, "Algebra", 10, 5, 70);
-    Course course2 = new Course(101, "Geometrie", 10, 4, 60);
-    Student student1 = new Student("Viorel", "Curecheriu", 1, 30);
-    Student student2 = new Student("Dorel", "Lob", 2, 20);
-    Student student3 = new Student("Victor", "Grigore", 3, 25);
-    Teacher teacher1 = new Teacher("Johann", "Klaus", 10);
-    Teacher teacher2 = new Teacher("Markus", "Aureli's", 11);
+    static Course course1 = new Course(100, "Algebra", 10, 5, 70);
+    static Course course2 = new Course(101, "Geometrie", 10, 4, 60);
+    static Student student1 = new Student("Viorel", "Curecheriu", 1, 30);
+    static Student student2 = new Student("Dorel", "Lob", 2, 20);
+    static Student student3 = new Student("Victor", "Grigore", 3, 25);
+    static Teacher teacher1 = new Teacher("Johann", "Klaus", 10);
+    static Teacher teacher2 = new Teacher("Markus", "Aureli's", 11);
 
     /**
      * sets courseJDBCRepository, studentJDBCRepository, teacherJDBCRepository, enrolledJDBCRepository
@@ -42,6 +43,21 @@ class ControllerTest {
         studentJDBCRepository.save(student2);
         studentJDBCRepository.delete(student3);
         teacherJDBCRepository.save(teacher1);
+        teacherJDBCRepository.delete(teacher2);
+        enrolledJDBCRepository.delete(student1.getStudentId(), course1.getCourseId());
+    }
+
+    /**
+     * deletes all from courseJDBCRepository, studentJDBCRepository, teacherJDBCRepository, enrolledJDBCRepository
+     */
+    @AfterAll
+    static void cleanUp() throws IOException {
+        courseJDBCRepository.delete(course1);
+        courseJDBCRepository.delete(course2);
+        studentJDBCRepository.delete(student1);
+        studentJDBCRepository.delete(student2);
+        studentJDBCRepository.delete(student3);
+        teacherJDBCRepository.delete(teacher1);
         teacherJDBCRepository.delete(teacher2);
         enrolledJDBCRepository.delete(student1.getStudentId(), course1.getCourseId());
     }
