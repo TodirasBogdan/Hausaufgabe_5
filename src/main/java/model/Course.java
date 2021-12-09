@@ -53,7 +53,7 @@ public record Course(int courseId, String name, int teacherId, int credits, int 
     }
 
     /**
-     * @return a hashcode of course
+     * return a hashcode of course
      */
     @Override
     public int hashCode() {
