@@ -3,7 +3,7 @@ package repository;
 import java.io.IOException;
 
 /**
- * declare create, getAll, update, delete functions
+ * declare findOne, findAll, save, update, delete functions
  *
  * @param <T>
  */

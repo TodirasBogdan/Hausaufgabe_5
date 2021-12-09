@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Student extends Person {
 
-    private int studentId;
-    private int totalCredits;
+    private final int studentId;
+    private final int totalCredits;
 
     public Student(String firstName, String lastName, int studentId, int totalCredits) {
         super(firstName, lastName);
@@ -17,18 +17,14 @@ public class Student extends Person {
         return studentId;
     }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
     public int getTotalCredits() {
         return totalCredits;
     }
 
-    public void setTotalCredits(int totalCredits) {
-        this.totalCredits = totalCredits;
-    }
 
+    /**
+     * return student and their details as a string
+     */
     @Override
     public String toString() {
         return "Student{" +
@@ -39,6 +35,12 @@ public class Student extends Person {
                 '}';
     }
 
+    /**
+     * check if two students are equal
+     *
+     * @param o is a student object
+     * @return true if two students are equal, otherwise false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,6 +49,9 @@ public class Student extends Person {
         return getStudentId() == student.getStudentId() && getTotalCredits() == student.getTotalCredits();
     }
 
+    /**
+     * return a hashcode of student
+     */
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getStudentId(), getTotalCredits());

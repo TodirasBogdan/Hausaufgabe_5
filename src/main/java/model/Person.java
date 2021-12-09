@@ -16,18 +16,14 @@ public class Person {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
+    /**
+     * return person and their details as a string
+     */
     @Override
     public String toString() {
         return "Person{" +
@@ -36,6 +32,12 @@ public class Person {
                 '}';
     }
 
+    /**
+     * check if two persons are equal
+     *
+     * @param o is a person object
+     * @return true if two persons are equal, otherwise false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,6 +45,9 @@ public class Person {
         return Objects.equals(getFirstName(), person.getFirstName()) && Objects.equals(getLastName(), person.getLastName());
     }
 
+    /**
+     * return a hashcode of person
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getFirstName(), getLastName());

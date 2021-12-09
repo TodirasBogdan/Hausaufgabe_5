@@ -16,6 +16,9 @@ public class UI {
         this.controller = controller;
     }
 
+    /**
+     * read a course from user input and return it
+     */
     public Course readCourse() {
         System.out.println("ID of the course:\n");
         int courseId = input.nextInt();
@@ -30,18 +33,24 @@ public class UI {
         return new Course(courseId, name, teacherId, credits, maxEnrollment);
     }
 
+    /**
+     * read a student from user input and return it
+     */
     public Student readStudent() {
         System.out.println("First name of the student:\n");
         String firstName = input.next();
         System.out.println("Last name of the student:\n");
         String lastName = input.next();
         System.out.println("Student ID:\n");
-        int sID = input.nextInt();
+        int studentId = input.nextInt();
         System.out.println("Number of credits:\n");
         int totalCredits = input.nextInt();
-        return new Student(firstName, lastName, sID, totalCredits);
+        return new Student(firstName, lastName, studentId, totalCredits);
     }
 
+    /**
+     * read a teacher from user input and return it
+     */
     public Teacher readTeacher() {
         System.out.println("First name of the teacher:\n");
         String firstName = input.next();
@@ -53,9 +62,9 @@ public class UI {
     }
 
     /**
-     * Function display uses a switch command to decide which methods of the controller to
-     * call;
-     * User must choose a number between 1-12 and 13 exits the app
+     * function display shows the options of the app in the console
+     * and uses a switch command to decide which methods of the controller to call;
+     * the user must choose a number between 1-17 or 18 to exit the app
      */
     public void display() throws IOException {
         while (true) {

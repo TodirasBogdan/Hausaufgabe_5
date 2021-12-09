@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Teacher extends Person {
 
-    private int teacherId;
+    private final int teacherId;
 
     public Teacher(String firstName, String lastName, int teacherId) {
         super(firstName, lastName);
@@ -15,10 +15,10 @@ public class Teacher extends Person {
         return teacherId;
     }
 
-    public void setTeacherId(int teacherId) {
-        this.teacherId = teacherId;
-    }
 
+    /**
+     * return teacher and their details as a string
+     */
     @Override
     public String toString() {
         return "Teacher{" +
@@ -28,6 +28,12 @@ public class Teacher extends Person {
                 '}';
     }
 
+    /**
+     * check if two teachers are equal
+     *
+     * @param o is a teacher object
+     * @return true if two teachers are equal, otherwise false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,6 +42,9 @@ public class Teacher extends Person {
         return getTeacherId() == teacher.getTeacherId();
     }
 
+    /**
+     * return a hashcode of teacher
+     */
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getTeacherId());
